@@ -43,4 +43,4 @@ Plain HTML, CSS and JavaScript. No dependencies.
 ## Author
 
 Made by **Aminur Refat Faisal**, Network Support Engineer-Intern, Infolink Limited.
-Email: arfaisal712@gmail.com · WhatsApp: 01711101445
+Email: arfaisal712@gmail.com
