@@ -1,0 +1,2275 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Intern Helper</title>
+    <script>
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem("ih-theme") ||
+          (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light");
+      } catch (e) {
+        document.documentElement.dataset.theme = "light";
+      }
+    </script>
+    <style>
+      :root {
+        --bg: #f2f6fc;
+        --card: #fff;
+        --ink: #16202e;
+        --mute: #64748b;
+        --line: #e1e8f2;
+        --soft: #edf3ff;
+        --hi: #f59e0b;
+        --ok: #16a34a;
+        --bad: #dc2626;
+        --sh: 0 1px 2px rgba(15, 23, 42, 0.06), 0 10px 28px rgba(15, 23, 42, 0.07);
+        --hh: 60px;
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      :root[data-theme="dark"] {
+        --bg: #0b1220;
+        --card: #131c2e;
+        --ink: #e8eefb;
+        --mute: #8da0bd;
+        --line: #23304a;
+        --soft: #182744;
+        --sh: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px rgba(0, 0, 0, 0.35);
+      }
+      .c {
+        --a: hsl(var(--h) 80% 40%);
+        --a2: hsl(calc(var(--h) + 40) 85% 52%);
+        --at: hsl(var(--h) 80% 34%);
+      }
+      [data-theme="dark"] .c {
+        --at: hsl(var(--h) 85% 72%);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-padding-top: calc(var(--hh) + env(safe-area-inset-top, 0px));
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          16px/1.6 "Segoe UI",
+          Inter,
+          system-ui,
+          -apple-system,
+          Roboto,
+          Arial,
+          sans-serif;
+        transition:
+          background 0.3s,
+          color 0.3s;
+      }
+      body:not(.admin) .ad {
+        display: none !important;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+      }
+      button:focus-visible,
+      input:focus-visible,
+      textarea:focus-visible {
+        outline: 3px solid var(--hi);
+        outline-offset: 2px;
+      }
+      .top {
+        position: sticky;
+        top: env(safe-area-inset-top, 0px);
+        z-index: 30;
+        height: var(--hh);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 18px;
+        background: color-mix(in srgb, var(--card) 82%, transparent);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--line);
+      }
+      .brand {
+        font-weight: 800;
+        font-size: 19px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        min-width: 0;
+      }
+      .brand b {
+        background: linear-gradient(90deg, #0891b2, #7c3aed);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .sp {
+        flex: 1;
+      }
+      .ib {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: var(--card);
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        transition: 0.2s;
+      }
+      .ib:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--sh);
+      }
+      .mb {
+        display: none;
+      }
+      .sw {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .sw input {
+        position: absolute;
+        opacity: 0;
+      }
+      .sw i {
+        width: 42px;
+        height: 24px;
+        border-radius: 99px;
+        background: var(--line);
+        position: relative;
+        transition: 0.25s;
+      }
+      .sw i::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 1px 3px #0004;
+        transition: 0.25s;
+      }
+      .sw input:checked + i {
+        background: linear-gradient(90deg, #0891b2, #7c3aed);
+      }
+      .sw input:checked + i::after {
+        transform: translateX(18px);
+      }
+      .sw input:focus-visible + i {
+        outline: 3px solid var(--hi);
+      }
+      .app {
+        display: grid;
+        grid-template-columns: 290px minmax(0, 1fr);
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      aside {
+        position: sticky;
+        top: calc(var(--hh) + env(safe-area-inset-top, 0px));
+        height: calc(100vh - var(--hh));
+        height: calc(100dvh - var(--hh));
+        overflow: auto;
+        padding: 16px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        border-right: 1px solid var(--line);
+      }
+      #list {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+      }
+      .ti {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-align: left;
+        border: 1px solid transparent;
+        background: transparent;
+        padding: 9px 10px;
+        border-radius: 12px;
+        transition: 0.18s;
+      }
+      .ti:hover {
+        background: var(--card);
+        transform: translateX(2px);
+      }
+      .ti[aria-current="true"] {
+        background: var(--card);
+        border-color: var(--a);
+        box-shadow: var(--sh);
+        font-weight: 700;
+      }
+      .ti .ib2 {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, var(--a), var(--a2));
+        font-size: 17px;
+        flex: none;
+      }
+      .ti span:nth-child(2) {
+        flex: 1;
+        min-width: 0;
+      }
+      .ti small {
+        color: var(--mute);
+        font-size: 12px;
+      }
+      .ti-s {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      input[type="search"],
+      dialog input:not([type="checkbox"]),
+      dialog textarea {
+        width: 100%;
+        font: inherit;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        color: var(--ink);
+      }
+      main {
+        padding: 26px 30px 70px;
+        min-width: 0;
+      }
+      .view {
+        animation: in 0.35s ease both;
+      }
+      @keyframes in {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+      }
+      .hero {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        color: #fff;
+        border-radius: 20px;
+        padding: 26px;
+        background: linear-gradient(135deg, var(--a), var(--a2));
+        box-shadow: var(--sh);
+        margin-bottom: 16px;
+      }
+      .hero .big {
+        font-size: 42px;
+        width: 76px;
+        height: 76px;
+        border-radius: 20px;
+        background: #ffffff2e;
+        display: grid;
+        place-items: center;
+        flex: none;
+      }
+      .hero h1 {
+        margin: 0;
+        font-size: 30px;
+        line-height: 1.2;
+      }
+      .hero p {
+        margin: 4px 0 0;
+        opacity: 0.92;
+        max-width: 62ch;
+      }
+      .bar {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 0 0 16px;
+        align-items: center;
+      }
+      .btn {
+        font-weight: 700;
+        padding: 9px 16px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: var(--card);
+        transition: 0.18s;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--sh);
+      }
+      .btn.p {
+        background: linear-gradient(135deg, #0891b2, #7c3aed);
+        border-color: transparent;
+        color: #fff;
+      }
+      .btn.d {
+        color: var(--bad);
+        border-color: var(--bad);
+      }
+      .btn.sm {
+        padding: 6px 10px;
+        font-size: 14px;
+      }
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 18px 20px;
+        margin-bottom: 16px;
+        box-shadow: var(--sh);
+      }
+      .panel h3 {
+        margin: 0 0 10px;
+        font-size: 17px;
+      }
+      .cap {
+        margin: 6px 0 0;
+        color: var(--mute);
+        font-size: 14px;
+      }
+      .topo {
+        width: 100%;
+        max-height: 170px;
+      }
+      .nd {
+        opacity: 0.4;
+        transition: 0.3s;
+      }
+      .nd.on {
+        opacity: 1;
+      }
+      .nd circle {
+        fill: var(--card);
+        stroke: var(--line);
+        stroke-width: 2.5;
+      }
+      .nd.on circle {
+        fill: var(--soft);
+        stroke: var(--a, #0891b2);
+        filter: drop-shadow(0 4px 8px #0891b244);
+      }
+      .nd text {
+        fill: var(--ink);
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .nd .t2 {
+        fill: var(--mute);
+        font-weight: 400;
+        font-size: 12px;
+      }
+      .wire {
+        stroke: var(--a, #0891b2);
+        stroke-width: 3;
+        stroke-dasharray: 7 7;
+        animation: dash 1s linear infinite;
+        stroke-linecap: round;
+      }
+      @keyframes dash {
+        to {
+          stroke-dashoffset: -14;
+        }
+      }
+      .fl {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 0;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .fl li {
+        display: flex;
+        align-items: center;
+      }
+      .fl li:not(:last-child)::after {
+        content: "";
+        width: 26px;
+        height: 3px;
+        margin: 0 5px;
+        border-radius: 3px;
+        background: linear-gradient(90deg, var(--a), var(--a2));
+      }
+      .fl .f {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 14px 5px 5px;
+        border-radius: 99px;
+        background: var(--soft);
+        border: 1px solid var(--line);
+        font-weight: 700;
+        font-size: 15px;
+      }
+      .fl .n {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--a), var(--a2));
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-size: 13px;
+      }
+      .fl li:last-child .f {
+        background: var(--ok);
+        border-color: var(--ok);
+        color: #fff;
+      }
+      .fl li:last-child .n {
+        background: #fff3;
+      }
+      .prog {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 4px 0 18px;
+        font-size: 14px;
+        color: var(--mute);
+      }
+      .prog div {
+        flex: 1;
+        height: 8px;
+        border-radius: 9px;
+        background: var(--line);
+        overflow: hidden;
+      }
+      .prog i {
+        display: block;
+        height: 100%;
+        background: linear-gradient(90deg, var(--a), var(--ok));
+        transition: width 0.4s;
+      }
+      .lnk {
+        border: 0;
+        background: none;
+        color: var(--at);
+        text-decoration: underline;
+        font-size: 14px;
+      }
+      .steps {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .step {
+        display: grid;
+        grid-template-columns: 46px 1fr;
+        gap: 14px;
+        position: relative;
+        padding-bottom: 16px;
+      }
+      .step:not(:last-child)::before {
+        content: "";
+        position: absolute;
+        left: 22px;
+        top: 46px;
+        bottom: 0;
+        border-left: 3px dotted var(--a);
+        opacity: 0.4;
+      }
+      .num {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        border: 0;
+        background: linear-gradient(135deg, var(--a), var(--a2));
+        color: #fff;
+        font-weight: 800;
+        font-size: 18px;
+        box-shadow: 0 4px 12px #0003;
+        transition: 0.25s;
+      }
+      .num:hover {
+        transform: scale(1.08);
+      }
+      .done .num {
+        background: var(--ok);
+      }
+      .body {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px 18px;
+        box-shadow: var(--sh);
+        transition: 0.25s;
+      }
+      .done .body {
+        opacity: 0.6;
+      }
+      .body p {
+        margin: 0 0 8px;
+      }
+      .body p:last-child {
+        margin: 0;
+      }
+      .path {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 3px;
+        margin: 6px 0;
+      }
+      .chip {
+        background: var(--soft);
+        border: 1px solid var(--line);
+        padding: 2px 10px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .chip.last {
+        background: var(--a);
+        border-color: var(--a);
+        color: #fff;
+      }
+      .ar {
+        color: var(--mute);
+        font-weight: 700;
+      }
+      code {
+        background: #f59e0b24;
+        border: 1px solid var(--hi);
+        padding: 1px 8px;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+      .tip {
+        background: #f59e0b1c;
+        border-left: 4px solid var(--hi);
+        padding: 9px 13px;
+        border-radius: 8px;
+        margin-top: 8px;
+        font-size: 15px;
+      }
+      .fields {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+        font-size: 15px;
+      }
+      .fields td {
+        border: 1px solid var(--line);
+        padding: 6px 10px;
+      }
+      .fields td:first-child {
+        background: var(--soft);
+        font-weight: 700;
+        width: 36%;
+      }
+      .grp {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+        margin-top: 8px;
+      }
+      .grp > div {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 12px;
+        background: var(--bg);
+      }
+      .grp b {
+        display: block;
+        color: var(--at);
+        margin-bottom: 4px;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 14px;
+      }
+      .card {
+        text-align: left;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-top: 4px solid var(--a);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: var(--sh);
+        transition: 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-4px);
+      }
+      .card .e {
+        font-size: 28px;
+      }
+      .card b {
+        display: block;
+      }
+      .card span {
+        color: var(--mute);
+        font-size: 14px;
+      }
+      .empty {
+        text-align: center;
+        color: var(--mute);
+        padding: 34px;
+      }
+      .tbw {
+        max-height: 66vh;
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--card);
+        box-shadow: var(--sh);
+      }
+      .dt {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: max-content;
+        min-width: 100%;
+      }
+      .dt th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: var(--soft);
+        border-bottom: 2px solid var(--a);
+        text-align: left;
+      }
+      .dt td {
+        border-bottom: 1px solid var(--line);
+        position: relative;
+      }
+      .dt tbody tr:nth-child(even) {
+        background: color-mix(in srgb, var(--soft) 50%, transparent);
+      }
+      .dt tbody tr:hover {
+        background: var(--soft);
+      }
+      .dt td:first-child,
+      .dt th:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 1;
+        width: 48px;
+        min-width: 48px;
+        text-align: center;
+        color: var(--mute);
+        font-size: 13px;
+        background: var(--soft);
+      }
+      .dt th:first-child {
+        z-index: 3;
+      }
+      .dt input {
+        border: 0;
+        background: transparent;
+        padding: 10px 12px;
+        width: 100%;
+        min-width: 160px;
+        font: inherit;
+        color: inherit;
+      }
+      .dt th input {
+        font-weight: 800;
+      }
+      .dt input:focus {
+        background: var(--card);
+      }
+      .dt input:focus-visible {
+        outline-offset: -3px;
+      }
+      .cp,
+      .mini {
+        border: 0;
+        background: transparent;
+        color: var(--mute);
+        border-radius: 6px;
+        padding: 2px 7px;
+      }
+      .cp {
+        position: absolute;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+        background: var(--card);
+      }
+      .dt td:hover .cp,
+      .cp:focus {
+        opacity: 1;
+      }
+      .mini:hover,
+      .cp:hover {
+        color: var(--bad);
+      }
+      .ch {
+        display: flex;
+        align-items: center;
+      }
+      dialog {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--card);
+        color: var(--ink);
+        width: min(640px, 94vw);
+        padding: 22px;
+        max-height: 90vh;
+        box-shadow: 0 20px 60px #0006;
+      }
+      dialog::backdrop {
+        background: #0008;
+        backdrop-filter: blur(3px);
+      }
+      dialog h3 {
+        margin: 0 0 6px;
+      }
+      dialog label {
+        display: block;
+        font-weight: 700;
+        margin-top: 12px;
+        font-size: 14px;
+      }
+      dialog .row {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 16px;
+        flex-wrap: wrap;
+      }
+      .sc {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+        margin-top: 12px;
+        background: var(--bg);
+      }
+      .ck {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 6px;
+        margin: 6px 14px 0 0 !important;
+      }
+      summary {
+        cursor: pointer;
+        color: #0891b2;
+        font-weight: 700;
+        margin-top: 8px;
+      }
+      #toast {
+        position: fixed;
+        left: 50%;
+        bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+        transform: translate(-50%, 20px);
+        background: var(--ink);
+        color: var(--bg);
+        padding: 9px 18px;
+        border-radius: 99px;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.3s;
+        z-index: 60;
+        font-weight: 700;
+        font-size: 14px;
+      }
+      #toast.on {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+      #scrim {
+        display: none;
+      }
+      dialog[open] {
+        animation: pop 0.22s ease;
+      }
+      @keyframes pop {
+        from {
+          opacity: 0;
+          transform: scale(0.96) translateY(8px);
+        }
+      }
+      .auth {
+        padding: 0;
+        overflow: auto;
+        width: min(430px, 94vw);
+      }
+      .auth .hd {
+        background: linear-gradient(135deg, #0891b2, #7c3aed);
+        color: #fff;
+        text-align: center;
+        padding: 26px 22px 20px;
+      }
+      .auth .lock {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #ffffff2e;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 10px;
+        box-shadow: 0 0 0 8px #ffffff14;
+      }
+      .auth h3 {
+        margin: 0;
+        font-size: 21px;
+      }
+      .auth .hd p {
+        margin: 4px 0 0;
+        opacity: 0.92;
+        font-size: 14px;
+      }
+      .auth .bd {
+        padding: 20px 22px 22px;
+      }
+      .pw {
+        position: relative;
+      }
+      .pw input {
+        padding-right: 64px !important;
+      }
+      .pw button {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .err {
+        color: var(--bad);
+        font-size: 14px;
+        margin: 8px 0 0;
+        font-weight: 600;
+      }
+      .note {
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--hi);
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-top: 18px;
+        font-size: 14px;
+      }
+      .note p {
+        margin: 0 0 8px;
+      }
+      .note p:last-child {
+        margin: 8px 0 0;
+        color: var(--mute);
+      }
+      .mc {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .cc {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 13px;
+        border: 1px solid var(--line);
+        border-radius: 99px;
+        background: var(--card);
+        text-decoration: none;
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 600;
+        transition: 0.2s;
+      }
+      .cc:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--sh);
+      }
+      .cc svg {
+        flex: none;
+      }
+      .shake {
+        animation: sh 0.4s;
+      }
+      @keyframes sh {
+        20%,
+        60% {
+          transform: translateX(-8px);
+        }
+        40%,
+        80% {
+          transform: translateX(8px);
+        }
+      }
+      .adb {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        background: #16a34a1f;
+        border: 1px solid var(--ok);
+        border-radius: 12px;
+        padding: 8px 14px;
+        margin-bottom: 14px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .maker {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 34px;
+        padding: 18px 20px;
+        border-radius: 16px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        box-shadow: var(--sh);
+      }
+      .av {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0891b2, #7c3aed);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 18px;
+        flex: none;
+      }
+      .mi {
+        flex: 1;
+        min-width: 210px;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.4;
+      }
+      .mi small {
+        color: var(--mute);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 11px;
+      }
+      .mi b {
+        font-size: 18px;
+      }
+      .mi span {
+        color: var(--mute);
+        font-size: 14px;
+      }
+      @media (max-width: 900px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .mb {
+          display: grid;
+        }
+        main {
+          padding: 18px 14px 60px;
+        }
+        .hero {
+          padding: 18px;
+        }
+        .hero h1 {
+          font-size: 24px;
+        }
+        .hero .big {
+          width: 60px;
+          height: 60px;
+          font-size: 32px;
+        }
+        aside {
+          position: fixed;
+          z-index: 50;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          height: auto;
+          width: min(310px, 86vw);
+          background: var(--card);
+          transform: translateX(-102%);
+          transition: transform 0.28s;
+          padding-top: calc(16px + env(safe-area-inset-top, 0px));
+        }
+        aside.open {
+          transform: none;
+        }
+        #scrim.on {
+          display: block;
+          position: fixed;
+          inset: 0;
+          z-index: 45;
+          background: #0006;
+        }
+        .sw span {
+          display: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <button class="ib mb" id="mb" aria-label="Open task list">☰</button>
+      <div class="brand"><span>🛰️</span><b id="bt"></b></div>
+      <span class="sp"></span>
+      <label class="sw" title="Admin mode shows all edit buttons"
+        ><input type="checkbox" id="adm" /><i></i><b id="al">🔒</b><span>Admin</span></label
+      >
+      <button class="ib" id="th" aria-label="Switch light or dark mode"></button>
+    </header>
+    <div class="app">
+      <aside id="sb">
+        <input type="search" id="sq" placeholder="Search tasks" aria-label="Search tasks" />
+        <nav id="list"></nav>
+        <div class="ti-s ad">
+          <button class="btn sm p" id="addT">+ Task</button
+          ><button class="btn sm" id="addB">+ Table</button
+          ><button class="btn sm" id="bk">Backup</button
+          ><button class="btn sm" id="pwb">🔑 Password</button>
+        </div>
+      </aside>
+      <div id="scrim"></div>
+      <main id="main"></main>
+    </div>
+    <div id="toast" role="status"></div>
+    <dialog id="edlg">
+      <form method="dialog" id="efrm">
+        <h3 id="edt">Edit task</h3>
+        <div id="edbody"></div>
+        <div class="row">
+          <button type="button" class="btn" id="ecan">Cancel</button
+          ><button type="button" class="btn" id="eadd">+ Add step</button
+          ><button class="btn p">Save</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="pdlg">
+      <form method="dialog" id="pfrm">
+        <h3>Edit page title and intro</h3>
+        <label>Title<input id="pt" required /></label
+        ><label>Intro text<textarea id="pi" rows="4"></textarea></label>
+        <div class="row">
+          <button type="button" class="btn" id="pcan">Cancel</button
+          ><button class="btn p">Save</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="cdlg">
+      <form method="dialog">
+        <h3 id="cmsg"></h3>
+        <p>This cannot be undone.</p>
+        <div class="row">
+          <button class="btn" value="no">Cancel</button
+          ><button class="btn d" value="yes">Delete</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="bdlg">
+      <form method="dialog">
+        <h3>Backup</h3>
+        <p style="margin: 0; color: var(--mute); font-size: 14px">
+          Your tasks are saved in this browser only. Copy the text below to keep a backup, or paste
+          a backup here and press Load.
+        </p>
+        <textarea id="bta" rows="9" style="margin-top: 10px" aria-label="Backup data"></textarea>
+        <div class="row">
+          <button type="button" class="btn d" id="brs">Reset to original</button
+          ><button type="button" class="btn" id="bsh">Show my data</button
+          ><button type="button" class="btn p" id="bld">Load</button
+          ><button class="btn" value="x">Close</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="adlg" class="auth">
+      <form id="afrm" autocomplete="off">
+        <div class="hd">
+          <div class="lock">
+            <svg
+              viewBox="0 0 24 24"
+              width="28"
+              height="28"
+              fill="none"
+              stroke="#fff"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="4" y="11" width="16" height="10" rx="2" />
+              <path d="M8 11V7a4 4 0 018 0v4" />
+            </svg>
+          </div>
+          <h3>Admin access</h3>
+          <p>Enter the admin password to add or edit anything.</p>
+        </div>
+        <div class="bd">
+          <div class="pw">
+            <input
+              type="password"
+              id="apw"
+              placeholder="Password"
+              aria-label="Admin password"
+              autocomplete="current-password"
+              required
+            /><button type="button" class="lnk" id="eye">Show</button>
+          </div>
+          <p class="err" id="aerr" role="alert" hidden>Incorrect password. Please try again.</p>
+          <div class="row">
+            <button type="button" class="btn" id="acan">Cancel</button
+            ><button class="btn p">Unlock</button>
+          </div>
+          <div class="note">
+            <p>If you need to add or edit anything ask password to <b>A R Faisal (Intern)</b>.</p>
+            <div class="mc" id="nc"></div>
+            <p>Thanks for your support.</p>
+          </div>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="cpdlg">
+      <form id="cpfrm">
+        <h3>Change admin password</h3>
+        <label
+          >New password<input
+            type="password"
+            id="np1"
+            autocomplete="new-password"
+            required /></label
+        ><label
+          >Confirm new password<input type="password" id="np2" autocomplete="new-password" required
+        /></label>
+        <p class="err" id="nerr" role="alert" hidden></p>
+        <div class="row">
+          <button type="button" class="btn" id="ncan">Cancel</button
+          ><button class="btn p">Save password</button>
+        </div>
+      </form>
+    </dialog>
+    <script>
+      const BUILT = [
+        {
+          id: "troubleshoot",
+          icon: "🛠️",
+          title: "Troubleshoot",
+          sum: "The client's internet is not working? Restart their ONU box from the OLT.",
+          dev: ["olt", "onu", "client"],
+          flow: ["Open client", "Copy MAC", "Search on OLT", "Reboot 3-4 times", "Check internet"],
+          steps: [
+            {
+              t: "Open the client's profile. Search by the client's ILC ID or name and click it.",
+              p: ["Clients", "ILC"],
+            },
+            {
+              t: "Copy the client's MAC address from the profile. The MAC is like an ID card for the client's ONU (the small box at their home).",
+            },
+            {
+              t: "Open the OLT page and paste the MAC in the search box. The client's ONU will show up in the list.",
+              p: ["OLT", "Search MAC"],
+            },
+            {
+              t: "Click Reboot on that ONU. Do it 3 or 4 times in total, waiting a few seconds between each one.",
+              tip: "Still no internet afterwards? Create a Support task (see Task Create).",
+            },
+          ],
+        },
+        {
+          id: "reverse",
+          icon: "🔎",
+          title: "Find MAC (reverse way)",
+          sum: "You know the client but not the MAC? Find it from the router side.",
+          dev: ["router", "olt", "onu"],
+          flow: [
+            "Router",
+            "Client IP",
+            "ARP",
+            "Last 4 of MAC",
+            "OLT MAC list",
+            "Port ID",
+            "ONU Config",
+            "MAC found",
+          ],
+          steps: [
+            {
+              t: "Open Winbox and log in to the router. Search for the client in the list.",
+              p: ["Winbox", "Access Router"],
+            },
+            { t: "Copy the client's IP address." },
+            {
+              t: "Open the ARP list and find that IP. The MAC address is on the same row.",
+              p: ["IP", "ARP"],
+            },
+            {
+              t: "Copy only the last 4 digits of that MAC. A short piece is enough to find it on the OLT.",
+            },
+            {
+              t: "Open the OLT and search those 4 digits in the MAC list. Copy the Port ID from the matching row.",
+              p: ["OLT", "OLT Configuration", "MAC", "Search MAC"],
+              ex: "EPON0/1:1",
+              tip: "Select the Port ID with your mouse and copy it.",
+            },
+            {
+              t: "Go to ONU Configuration and paste the Port ID in the search box. The client's full MAC address is shown there.",
+              p: ["ONU Configuration", "Search the port ID"],
+            },
+          ],
+        },
+        {
+          id: "taskcreate",
+          icon: "📝",
+          title: "Task Create",
+          sum: "Make a Support or Billing task so the right person follows it up.",
+          dev: [],
+          flow: ["Add Task", "Choose ILC", "Task type", "Title", "Assign"],
+          steps: [
+            { t: "Click Add Task.", p: ["Task", "Add Task"] },
+            { t: "Select the client (ILC).", p: ["ILC"] },
+            {
+              t: "Choose the Task Type: Support (for a technical problem) or Billing (for a payment matter).",
+            },
+            {
+              t: "Write a short Task Title that says the problem. Copy the same text into Description.",
+            },
+            {
+              t: "Assign the task. Who you choose depends on the type:",
+              branch: [
+                {
+                  h: "Support",
+                  l: [
+                    ["Task Assign", "Muntassir Shakib"],
+                    ["Technician (Demra)", "Sohag"],
+                    ["Technician (other areas)", "Habib"],
+                  ],
+                },
+                {
+                  h: "Billing",
+                  l: [
+                    ["Task Assign", "Sabbir"],
+                    ["Acknowledgement", "Russel"],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: "mac",
+          icon: "⚙️",
+          title: "MAC Configure",
+          sum: "Set the client's VLAN on their ONU so the connection works.",
+          dev: ["olt", "onu"],
+          flow: ["Open ONU", "Config", "VLAN mode: tag", "PVID", "Priority 1", "Save"],
+          steps: [
+            {
+              t: "Open the client's profile and go to the OLT page.",
+              p: ["Clients", "ILC", "OLT"],
+            },
+            {
+              t: "Open ONU Configuration, search the client's MAC and click Config. Then open the VLAN settings.",
+              p: ["ONU Configuration", "Search MAC", "Config", "VLAN"],
+            },
+            { t: "Set VLAN Mode to tag." },
+            {
+              t: "Find the client's VLAN number and type it in the PVID box.",
+              tip: "Not sure of the VLAN? Check the OLT List, or Winbox > IP > Addresses (see New Connection).",
+            },
+            { t: "Set PVID Priority to 1." },
+            {
+              t: "Click Submit, then click Save in the top right corner.",
+              tip: "If you skip Save, the change is lost.",
+            },
+          ],
+        },
+        {
+          id: "onuloss",
+          icon: "📉",
+          title: "ONU Loss - UP",
+          sum: "Check how strong the light signal is at the client's ONU.",
+          dev: ["olt", "onu"],
+          flow: ["Open client", "OLT", "Search MAC", "Config", "Copy power"],
+          steps: [
+            {
+              t: "Open the client's profile and go to the OLT page.",
+              p: ["Clients", "ILC", "OLT"],
+            },
+            {
+              t: "Open ONU Configuration, search the client's MAC and click Config.",
+              p: ["ONU Configuration", "Search MAC", "Config"],
+            },
+            {
+              t: "Copy the Receive Power value and write it in your task or report.",
+              ex: "-23.45 dBm",
+              tip: "Rule of thumb: closer to 0 is stronger. Around -8 to -27 dBm is usually fine, lower is weak. Ask your supervisor for the exact limit.",
+            },
+          ],
+        },
+        {
+          id: "newconn",
+          icon: "🔌",
+          title: "New Connection",
+          sum: "Set up a brand new client, from the request to the final note.",
+          dev: ["router", "olt", "onu", "client"],
+          flow: [
+            "Pending request",
+            "Messenger group",
+            "OLT",
+            "Fiber details",
+            "Winbox PPP",
+            "IP Addresses",
+            "Fill the form",
+          ],
+          steps: [
+            {
+              t: "Open the pending request. Copy the client's name, phone, Latitude and Longitude. You will need them later.",
+              p: ["Connections", "Pending Requests", "Search ILC"],
+            },
+            {
+              t: "Open the Messenger Transmission group and search the ILC. This shows the OLT name and the ONU pictures.",
+              p: ["Connection", "Messenger Transmission group", "Search ILC"],
+            },
+            { t: "Look at the ONU picture and take the MAC written on the ONU." },
+            {
+              t: "Go to the OLT and search that MAC. Copy three things: the OLT address, the MAC and the ONU serial.",
+              p: ["OLT", "Search MAC"],
+              ex: "10.5.6.66 and EPON0/1:4",
+            },
+            {
+              t: "Open the Fiber Details group, search the ILC and copy the cable ID and M.",
+              p: ["Fiber Details group", "Search ILC"],
+            },
+            {
+              t: "In Winbox, open the client's PPP secret and copy its Remote Address (the client's IP).",
+              p: ["Winbox", "Access Router", "PPP", "Secrets", "Search ILC", "Double-click user"],
+            },
+            {
+              t: "Still in Winbox, open IP > Addresses. Paste the IP in the Find box (top right), then delete digits from the end until only the last dot is left. Keep the dot. The matching row shows the subnet (/24, /25 ...), OLT name and VLAN.",
+              p: ["IP", "Addresses"],
+              tip: "Example: 10.20.30.45 becomes 10.20.30.",
+            },
+            {
+              t: "Go back to the New Connection tab and fill the form with what you collected:",
+              fields: [
+                ["Network", "Same IP, but the last number is 0"],
+                ["Subnet", "255.255.255.0 (or what step 7 showed)"],
+                ["Gateway", "Same IP, but the last number is 1"],
+                ["Switch details", "The OLT address"],
+                ["Network path", "The OLT name"],
+                ["Others", "N/A"],
+                ["Employee name", "Sharmin"],
+                ["Tag", "staff quarter for Demra, others for the rest"],
+                ["Note", "Ok (your name)"],
+              ],
+            },
+          ],
+        },
+        {
+          id: "giveip",
+          icon: "🌐",
+          title: "Give IP",
+          sum: "Steps not written yet. Admin: press Edit task to add them.",
+          dev: [],
+          flow: [],
+          steps: [],
+        },
+      ];
+      const OLT = [
+        ["Amulia_OLT_1", "10.5.6.74"],
+        ["Amulia_Paity_OLT_1", "10.5.8.10"],
+        ["Paity_OLT_2", "10.5.6.53"],
+        ["Konapara_OLT_1", "10.5.7.3"],
+        ["Konapara_OLT_2", "10.5.7.2"],
+        ["Matuail_POP_OLT", "10.5.6.66"],
+        ["Borovanga_OLT", "10.5.8.2"],
+        ["Ranimohol_OLT", "10.5.6.110"],
+        ["Aman_City_POP_OLT", "10.5.6.166"],
+        ["Baridhara_POP_OLT", "10.5.5.6"],
+        ["Cocacola_OLT", "10.5.5.25"],
+        ["Gulshan_POP_OLT", "10.5.5.24"],
+        ["Banani_POP_OLT", "10.5.5.27"],
+        ["Badda_POP_OLT", "10.5.5.26"],
+        ["Aftabnagar_POP_OLT", "10.5.9.34"],
+        ["Rampura_POP_OLT", "10.5.5.40"],
+        ["Banasree_OLT", "10.5.5.22"],
+        ["Dhanmondi_POP_OLT", "10.5.6.19"],
+        ["Poribagh_POP_OLT", "10.5.6.20"],
+        ["Tikatuli_POP_OLT", "10.5.6.82"],
+        ["Saidpur_POP_OLT", "10.5.6.86"],
+      ];
+      BUILT.push({
+        id: "oltlist",
+        icon: "📋",
+        title: "OLT List",
+        sum: "Find an OLT's address and VLAN. Click the copy icon on any box to copy it.",
+        dev: [],
+        flow: [],
+        steps: [],
+        table: {
+          cols: ["OLT", "Address", "VLAN"],
+          rows: OLT.map((r) => [r[0], r[1], ""]).concat(
+            Array.from({ length: 21 }, () => ["", "", ""]),
+          ),
+        },
+      });
+      const $ = (s) => document.querySelector(s),
+        clone = (o) => JSON.parse(JSON.stringify(o)),
+        KEY = "intern-helper-v3";
+      const esc = (s) =>
+        String(s == null ? "" : s).replace(
+          /[&<>"]/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+        );
+      const H = [188, 152, 262, 28, 338, 214, 96, 300],
+        hue = (i) => H[(i < 0 ? 0 : i) % H.length];
+      const fresh = () => ({
+        title: "Intern Helper",
+        intro:
+          "Pick a task from the list. Each task shows where it happens, the big picture, then every step in order. Tick a step when you finish it.",
+        tasks: clone(BUILT),
+        done: {},
+      });
+      function load() {
+        let d = null;
+        try {
+          d = JSON.parse(localStorage.getItem(KEY));
+        } catch (e) {}
+        if (!d || !Array.isArray(d.tasks)) {
+          d = fresh();
+          try {
+            const o = JSON.parse(localStorage.getItem("intern-helper") || "null");
+            if (Array.isArray(o))
+              o.forEach((t) => {
+                if (t && t.table) {
+                  const i = d.tasks.findIndex((x) => x.id === t.id);
+                  i > -1 ? (d.tasks[i] = t) : d.tasks.push(t);
+                } else if (t && /^c\d/.test(t.id)) d.tasks.push(t);
+              });
+          } catch (e) {}
+        }
+        d.done = d.done || {};
+        return d;
+      }
+      let db = load(),
+        cur = "home",
+        ed = null,
+        isNew = false,
+        pend = null,
+        ok = true;
+      function save() {
+        try {
+          localStorage.setItem(KEY, JSON.stringify(db));
+        } catch (e) {
+          ok = false;
+          toast("Could not save in this browser mode");
+        }
+      }
+      function toast(m) {
+        const t = $("#toast");
+        t.textContent = m;
+        t.classList.add("on");
+        clearTimeout(toast.i);
+        toast.i = setTimeout(() => t.classList.remove("on"), 1800);
+      }
+      const adm = () => document.body.classList.contains("admin"),
+        T = (id) => db.tasks.find((t) => t.id === id);
+      function topo(dev) {
+        const N = [
+          ["router", "Router", "🌐", "Winbox"],
+          ["olt", "OLT", "🗄️", "Search MAC"],
+          ["onu", "ONU", "📦", "Client's box"],
+          ["client", "Client", "🏠", "ILC"],
+        ];
+        return (
+          '<svg class="topo" viewBox="0 0 640 140" role="img" aria-label="Router to OLT to ONU to Client">' +
+          [0, 1, 2]
+            .map(
+              (i) =>
+                '<line class="wire" x1="' +
+                (114 + i * 140) +
+                '" y1="50" x2="' +
+                (166 + i * 140) +
+                '" y2="50"/>',
+            )
+            .join("") +
+          N.map(
+            (n, i) =>
+              '<g class="nd' +
+              (!dev || dev.includes(n[0]) ? " on" : "") +
+              '" transform="translate(' +
+              (80 + i * 160) +
+              ',50)"><circle r="34"/><text y="10" text-anchor="middle" style="font-size:28px">' +
+              n[2] +
+              '</text><text y="64" text-anchor="middle">' +
+              n[1] +
+              '</text><text y="82" text-anchor="middle" class="t2">' +
+              n[3] +
+              "</text></g>",
+          ).join("") +
+          "</svg>"
+        );
+      }
+      const flowH = (f) =>
+        '<ol class="fl">' +
+        f
+          .map(
+            (x, i) =>
+              '<li><span class="f"><span class="n">' +
+              (i + 1) +
+              "</span>" +
+              esc(x) +
+              "</span></li>",
+          )
+          .join("") +
+        "</ol>";
+      function stepH(t, s, k) {
+        const d = db.done[t.id + ":" + k];
+        let b = s.t ? "<p>" + esc(s.t) + "</p>" : "";
+        if (s.p)
+          b +=
+            '<div class="path">' +
+            s.p
+              .map(
+                (x, j) =>
+                  (j ? '<span class="ar">›</span>' : "") +
+                  '<span class="chip' +
+                  (j === s.p.length - 1 ? " last" : "") +
+                  '">' +
+                  esc(x) +
+                  "</span>",
+              )
+              .join("") +
+            "</div>";
+        if (s.ex) b += "<p>Example: <code>" + esc(s.ex) + "</code></p>";
+        if (s.branch)
+          b +=
+            '<div class="grp">' +
+            s.branch
+              .map(
+                (g) =>
+                  "<div><b>" +
+                  esc(g.h) +
+                  "</b>" +
+                  g.l
+                    .map(
+                      (r) =>
+                        "<div>" +
+                        esc(r[0]) +
+                        ' <span class="ar">›</span> <span class="chip">' +
+                        esc(r[1]) +
+                        "</span></div>",
+                    )
+                    .join("") +
+                  "</div>",
+              )
+              .join("") +
+            "</div>";
+        if (s.fields)
+          b +=
+            '<div style="overflow-x:auto"><table class="fields">' +
+            s.fields
+              .map((f) => "<tr><td>" + esc(f[0]) + "</td><td>" + esc(f[1]) + "</td></tr>")
+              .join("") +
+            "</table></div>";
+        if (s.tip) b += '<div class="tip">💡 ' + esc(s.tip) + "</div>";
+        return (
+          '<li class="step' +
+          (d ? " done" : "") +
+          '"><button class="num" data-k="' +
+          k +
+          '" aria-pressed="' +
+          !!d +
+          '" title="Tick when done">' +
+          (d ? "✓" : k + 1) +
+          '</button><div class="body">' +
+          b +
+          "</div></li>"
+        );
+      }
+      function tableH(t) {
+        const b = t.table,
+          rw = adm() ? "" : " readonly";
+        return (
+          '<div class="bar"><input type="search" id="tq" placeholder="Search this table" aria-label="Search this table" style="max-width:260px"><span class="cap" id="tc" style="margin:0">' +
+          b.rows.length +
+          ' rows</span><span class="sp"></span><button class="btn ad" data-a="addRow">+ Row</button><button class="btn ad" data-a="addCol">+ Column</button></div>' +
+          '<div class="tbw"><table class="dt"><thead><tr><th>#</th>' +
+          b.cols
+            .map(
+              (c, j) =>
+                '<th><div class="ch"><input data-h="' +
+                j +
+                '" value="' +
+                esc(c) +
+                '" aria-label="Column name"' +
+                rw +
+                '><button class="mini ad" data-dc="' +
+                j +
+                '" aria-label="Delete column">✕</button></div></th>',
+            )
+            .join("") +
+          '<th class="ad"></th></tr></thead><tbody>' +
+          b.rows
+            .map(
+              (r, i) =>
+                "<tr><td>" +
+                (i + 1) +
+                "</td>" +
+                b.cols
+                  .map(
+                    (c, j) =>
+                      '<td><input data-r="' +
+                      i +
+                      '" data-c="' +
+                      j +
+                      '" value="' +
+                      esc(r[j]) +
+                      '" aria-label="' +
+                      esc(c) +
+                      ", row " +
+                      (i + 1) +
+                      '"' +
+                      rw +
+                      '><button class="cp" data-cp="' +
+                      i +
+                      "," +
+                      j +
+                      '" aria-label="Copy" title="Copy">⧉</button></td>',
+                  )
+                  .join("") +
+                '<td class="ad"><button class="mini" data-dr="' +
+                i +
+                '" aria-label="Delete row ' +
+                (i + 1) +
+                '">✕</button></td></tr>',
+            )
+            .join("") +
+          "</tbody></table></div>"
+        );
+      }
+      function view() {
+        let h;
+        if (cur === "home") {
+          h =
+            '<div class="view c" style="--h:200"><section class="hero"><div class="big">🛰️</div><div><h1>' +
+            esc(db.title) +
+            "</h1><p>" +
+            esc(db.intro) +
+            '</p></div></section><div class="bar ad"><button class="btn" data-a="page">✏️ Edit title and intro</button></div><div class="panel"><h3>How the network fits together</h3>' +
+            topo() +
+            '<p class="cap">Most tasks mean: find the client\'s MAC, then do something on the OLT.</p></div><div class="cards">' +
+            db.tasks
+              .map(
+                (t, i) =>
+                  '<button class="card c" style="--h:' +
+                  hue(i) +
+                  '" data-id="' +
+                  esc(t.id) +
+                  '"><div class="e">' +
+                  esc(t.icon) +
+                  "</div><b>" +
+                  esc(t.title) +
+                  "</b><span>" +
+                  esc(t.sum) +
+                  "</span></button>",
+              )
+              .join("") +
+            "</div></div>";
+        } else {
+          const t = T(cur),
+            i = db.tasks.indexOf(t);
+          h =
+            '<div class="view c" style="--h:' +
+            hue(i) +
+            '"><section class="hero"><div class="big">' +
+            esc(t.icon) +
+            "</div><div><h1>" +
+            esc(t.title) +
+            "</h1><p>" +
+            esc(t.sum) +
+            '</p></div></section><div class="bar ad"><button class="btn p" data-a="edit">✏️ Edit task</button><button class="btn" data-a="up" aria-label="Move up">↑</button><button class="btn" data-a="dn" aria-label="Move down">↓</button><button class="btn d" data-a="del">🗑️ Delete</button></div>';
+          if (t.table) h += tableH(t);
+          else {
+            if (t.dev && t.dev.length)
+              h +=
+                '<div class="panel"><h3>Where this happens</h3>' +
+                topo(t.dev) +
+                '<p class="cap">Lit-up devices are the ones you work with in this task.</p></div>';
+            if (t.flow && t.flow.length)
+              h += '<div class="panel"><h3>The big picture</h3>' + flowH(t.flow) + "</div>";
+            const n = t.steps.length,
+              dn = t.steps.filter((s, k) => db.done[t.id + ":" + k]).length;
+            h += n
+              ? '<div class="prog"><div><i style="width:' +
+                (dn / n) * 100 +
+                '%"></i></div><span>' +
+                dn +
+                "/" +
+                n +
+                " done</span>" +
+                (dn ? '<button class="lnk" data-a="reset">Reset ticks</button>' : "") +
+                '</div><ol class="steps">' +
+                t.steps.map((s, k) => stepH(t, s, k)).join("") +
+                "</ol>"
+              : '<div class="panel empty">No steps yet.</div>';
+          }
+          h += "</div>";
+        }
+        $("#main").innerHTML =
+          (adm()
+            ? '<div class="adb">🔓 Admin mode is on. You can edit everything. <button class="lnk" data-a="lock">Lock</button></div>'
+            : "") +
+          h +
+          MAKER;
+      }
+      function list() {
+        const q = $("#sq").value.toLowerCase();
+        $("#list").innerHTML =
+          '<button class="ti c" style="--h:200" data-id="home" aria-current="' +
+          (cur === "home") +
+          '"><span class="ib2">🏠</span><span>Start here</span></button>' +
+          db.tasks
+            .map((t, i) =>
+              t.title.toLowerCase().includes(q)
+                ? '<button class="ti c" style="--h:' +
+                  hue(i) +
+                  '" data-id="' +
+                  esc(t.id) +
+                  '" aria-current="' +
+                  (cur === t.id) +
+                  '"><span class="ib2">' +
+                  esc(t.icon) +
+                  "</span><span>" +
+                  esc(t.title) +
+                  "</span><small>" +
+                  (t.table ? t.table.rows.length + " rows" : t.steps.length + " steps") +
+                  "</small></button>"
+                : "",
+            )
+            .join("");
+      }
+      function show(id, keep) {
+        cur = T(id) ? id : "home";
+        list();
+        view();
+        $("#bt").textContent = db.title;
+        document.title = db.title;
+        side(0);
+        if (!keep) scrollTo(0, 0);
+        try {
+          history.replaceState(null, "", "#" + cur);
+        } catch (e) {}
+      }
+      function side(o) {
+        $("#sb").classList.toggle("open", !!o);
+        $("#scrim").classList.toggle("on", !!o);
+      }
+      function ask(m, fn) {
+        pend = fn;
+        $("#cmsg").textContent = m;
+        $("#cdlg").returnValue = "";
+        $("#cdlg").showModal();
+      }
+      $("#cdlg").addEventListener("close", () => {
+        if ($("#cdlg").returnValue === "yes" && pend) {
+          pend();
+          pend = null;
+        }
+      });
+      function cp(s) {
+        const f = () => {
+          const x = document.createElement("textarea");
+          x.value = s;
+          document.body.appendChild(x);
+          x.select();
+          try {
+            document.execCommand("copy");
+          } catch (e) {}
+          x.remove();
+        };
+        try {
+          navigator.clipboard.writeText(s).catch(f);
+        } catch (e) {
+          f();
+        }
+        toast(s ? "Copied: " + s : "Nothing to copy");
+      }
+      const pRows = (s) =>
+        s
+          .split("\n")
+          .map((x) => x.trim())
+          .filter(Boolean)
+          .map((x) => {
+            const i = x.indexOf(":");
+            return i < 0 ? [x, ""] : [x.slice(0, i).trim(), x.slice(i + 1).trim()];
+          });
+      const pBr = (s) => {
+        const o = [];
+        s.split("\n")
+          .map((x) => x.trim())
+          .filter(Boolean)
+          .forEach((x) => {
+            if (x[0] === "#") o.push({ h: x.slice(1).trim(), l: [] });
+            else {
+              if (!o.length) o.push({ h: "", l: [] });
+              o[o.length - 1].l.push(...pRows(x));
+            }
+          });
+        return o;
+      };
+      const rT = (a) => (a || []).map((r) => r[0] + ": " + r[1]).join("\n"),
+        bT = (b) => (b || []).map((g) => "# " + g.h + "\n" + rT(g.l)).join("\n");
+      const fld = (l, k, v, r) =>
+        "<label>" +
+        l +
+        (r
+          ? '<textarea data-f="' + k + '" rows="' + r + '">' + esc(v) + "</textarea>"
+          : '<input data-f="' + k + '" value="' + esc(v) + '">') +
+        "</label>";
+      const DV = [
+        ["router", "Router"],
+        ["olt", "OLT"],
+        ["onu", "ONU"],
+        ["client", "Client"],
+      ];
+      function openEd(t, n) {
+        ed = clone(t);
+        isNew = !!n;
+        $("#edt").textContent = n ? "Add a task" : "Edit task";
+        draw();
+        $("#edlg").showModal();
+      }
+      function draw() {
+        let h =
+          fld("Icon (emoji)", "icon", ed.icon) +
+          fld("Task name", "title", ed.title) +
+          fld("Short description", "sum", ed.sum || "", 2);
+        if (!ed.table) {
+          h +=
+            "<label>Devices used (lit up in the diagram)</label>" +
+            DV.map(
+              (d) =>
+                '<label class="ck"><input type="checkbox" data-dv="' +
+                d[0] +
+                '"' +
+                ((ed.dev || []).includes(d[0]) ? " checked" : "") +
+                ">" +
+                d[1] +
+                "</label>",
+            ).join("") +
+            fld("Big picture flow (separate with &gt;)", "flow", (ed.flow || []).join(" > ")) +
+            '<h4 style="margin:18px 0 0">Steps</h4>' +
+            ed.steps
+              .map(
+                (s, i) =>
+                  '<div class="sc"><b>Step ' +
+                  (i + 1) +
+                  "</b>" +
+                  fld("What to do", "t", s.t || "", 3) +
+                  fld("Menu path (A &gt; B &gt; C)", "p", (s.p || []).join(" > ")) +
+                  fld("Example", "ex", s.ex || "") +
+                  fld("Tip", "tip", s.tip || "") +
+                  "<details" +
+                  (s.fields || s.branch ? " open" : "") +
+                  "><summary>Table or groups (advanced)</summary>" +
+                  fld("Table rows, one per line: Label: value", "f", rT(s.fields), 3) +
+                  fld("Groups: start with # Name, then Label: value lines", "b", bT(s.branch), 4) +
+                  '</details><div class="row" style="justify-content:flex-start"><button type="button" class="btn sm" data-s="up" data-i="' +
+                  i +
+                  '">↑ Up</button><button type="button" class="btn sm" data-s="dn" data-i="' +
+                  i +
+                  '">↓ Down</button><button type="button" class="btn sm d" data-s="rm" data-i="' +
+                  i +
+                  '">Remove</button></div></div>',
+              )
+              .join("");
+        } else $("#eadd").hidden = true;
+        $("#eadd").hidden = !!ed.table;
+        $("#edbody").innerHTML = h;
+        $("#edbody [data-f=title]").required = true;
+      }
+      function collect() {
+        const g = (k) => $("#edbody [data-f=" + k + "]").value.trim();
+        ed.icon = g("icon") || "📌";
+        ed.title = g("title");
+        ed.sum = g("sum");
+        if (ed.table) return;
+        ed.dev = [...document.querySelectorAll("#edbody [data-dv]:checked")].map(
+          (x) => x.dataset.dv,
+        );
+        ed.flow = g("flow")
+          .split(">")
+          .map((x) => x.trim())
+          .filter(Boolean);
+        ed.steps = [...document.querySelectorAll("#edbody .sc")]
+          .map((c) => {
+            const v = (k) => c.querySelector("[data-f=" + k + "]").value.trim(),
+              s = {};
+            if (v("t")) s.t = v("t");
+            const p = v("p")
+              .split(">")
+              .map((x) => x.trim())
+              .filter(Boolean);
+            if (p.length) s.p = p;
+            if (v("ex")) s.ex = v("ex");
+            if (v("tip")) s.tip = v("tip");
+            const f = pRows(v("f"));
+            if (f.length) s.fields = f;
+            const b = pBr(v("b"));
+            if (b.length) s.branch = b;
+            return s;
+          })
+          .filter((s) => Object.keys(s).length);
+      }
+      $("#edbody").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-s]");
+        if (!b) return;
+        collect();
+        const i = +b.dataset.i,
+          s = ed.steps,
+          a = b.dataset.s;
+        if (a === "rm") s.splice(i, 1);
+        else if (a === "up" && i > 0) [s[i - 1], s[i]] = [s[i], s[i - 1]];
+        else if (a === "dn" && i < s.length - 1) [s[i + 1], s[i]] = [s[i], s[i + 1]];
+        draw();
+      });
+      $("#eadd").onclick = () => {
+        collect();
+        ed.steps.push({ t: "" });
+        draw();
+        const c = document.querySelectorAll("#edbody .sc");
+        c[c.length - 1].scrollIntoView({ block: "center" });
+      };
+      $("#ecan").onclick = () => $("#edlg").close();
+      $("#efrm").addEventListener("submit", () => {
+        collect();
+        if (isNew) db.tasks.push(ed);
+        else {
+          const i = db.tasks.findIndex((t) => t.id === ed.id);
+          if (i > -1) db.tasks[i] = ed;
+        }
+        save();
+        show(ed.id, 1);
+        toast("Saved");
+      });
+      $("#pcan").onclick = () => $("#pdlg").close();
+      $("#pfrm").addEventListener("submit", () => {
+        db.title = $("#pt").value.trim() || "Intern Helper";
+        db.intro = $("#pi").value.trim();
+        save();
+        show(cur, 1);
+        toast("Saved");
+      });
+      function act(a) {
+        const t = T(cur),
+          i = db.tasks.indexOf(t),
+          tb = t && t.table;
+        if (a === "lock") {
+          setAdm(false);
+          view();
+          return;
+        }
+        if (a === "page") {
+          $("#pt").value = db.title;
+          $("#pi").value = db.intro;
+          $("#pdlg").showModal();
+        } else if (a === "edit") openEd(t);
+        else if (a === "up" || a === "dn") {
+          const j = a === "up" ? i - 1 : i + 1;
+          if (j >= 0 && j < db.tasks.length) {
+            [db.tasks[i], db.tasks[j]] = [db.tasks[j], db.tasks[i]];
+            save();
+            show(cur, 1);
+          }
+        } else if (a === "del")
+          ask('Delete "' + t.title + '"?', () => {
+            db.tasks = db.tasks.filter((x) => x !== t);
+            save();
+            show("home");
+          });
+        else if (a === "reset") {
+          t.steps.forEach((s, k) => delete db.done[t.id + ":" + k]);
+          save();
+          view();
+        } else if (a === "addRow") {
+          tb.rows.push(tb.cols.map(() => ""));
+          save();
+          view();
+          const w = document.querySelector(".tbw");
+          w.scrollTop = w.scrollHeight;
+          document.querySelector(".dt tbody tr:last-child input").focus();
+        } else if (a === "addCol") {
+          tb.cols.push("Column " + (tb.cols.length + 1));
+          tb.rows.forEach((r) => r.push(""));
+          save();
+          view();
+          const w = document.querySelector(".tbw");
+          w.scrollLeft = w.scrollWidth;
+        }
+      }
+      document.addEventListener("click", (e) => {
+        const g = (s) => e.target.closest(s);
+        let b;
+        if ((b = g("[data-id]"))) return show(b.dataset.id);
+        if ((b = g("[data-k]"))) {
+          const t = T(cur),
+            k = t.id + ":" + b.dataset.k;
+          db.done[k] ? delete db.done[k] : (db.done[k] = 1);
+          save();
+          view();
+          return;
+        }
+        if ((b = g("[data-a]"))) return act(b.dataset.a);
+        if ((b = g("[data-cp]"))) {
+          const [r, c] = b.dataset.cp.split(",");
+          return cp(T(cur).table.rows[r][c] || "");
+        }
+        if ((b = g("[data-dr],[data-dc]"))) {
+          const t = T(cur).table;
+          if (b.dataset.dr !== undefined) {
+            const i = +b.dataset.dr,
+              go = () => {
+                t.rows.splice(i, 1);
+                save();
+                view();
+              };
+            t.rows[i].some((x) => x) ? ask("Delete row " + (i + 1) + "?", go) : go();
+          } else if (t.cols.length > 1) {
+            const j = +b.dataset.dc;
+            ask('Delete column "' + t.cols[j] + '"?', () => {
+              t.cols.splice(j, 1);
+              t.rows.forEach((r) => r.splice(j, 1));
+              save();
+              view();
+            });
+          }
+        }
+      });
+      document.addEventListener("input", (e) => {
+        const i = e.target,
+          t = T(cur);
+        if (i.id === "sq") return list();
+        if (!t || !t.table) return;
+        if (i.dataset.h !== undefined) {
+          t.table.cols[+i.dataset.h] = i.value;
+          save();
+        } else if (i.dataset.r !== undefined) {
+          t.table.rows[+i.dataset.r][+i.dataset.c] = i.value;
+          save();
+        } else if (i.id === "tq") {
+          const q = i.value.toLowerCase();
+          let n = 0;
+          document.querySelectorAll(".dt tbody tr").forEach((tr) => {
+            const m =
+              !q ||
+              [...tr.querySelectorAll("input")].some((x) => x.value.toLowerCase().includes(q));
+            tr.hidden = !m;
+            if (m) n++;
+          });
+          $("#tc").textContent = (q ? n + " of " : "") + t.table.rows.length + " rows";
+        }
+      });
+      $("#addT").onclick = () =>
+        openEd(
+          {
+            id: "c" + Date.now(),
+            icon: "📌",
+            title: "",
+            sum: "",
+            dev: [],
+            flow: [],
+            steps: [{ t: "" }],
+          },
+          1,
+        );
+      $("#addB").onclick = () => {
+        const t = {
+          id: "c" + Date.now(),
+          icon: "📊",
+          title: "New table",
+          sum: "",
+          dev: [],
+          flow: [],
+          steps: [],
+          table: { cols: ["Name", "Details"], rows: Array.from({ length: 5 }, () => ["", ""]) },
+        };
+        db.tasks.push(t);
+        save();
+        show(t.id);
+        openEd(t);
+      };
+      $("#bk").onclick = () => {
+        $("#bta").value = "";
+        $("#bdlg").showModal();
+      };
+      $("#bsh").onclick = () => {
+        $("#bta").value = JSON.stringify(db);
+        $("#bta").select();
+      };
+      $("#bld").onclick = () => {
+        try {
+          const d = JSON.parse($("#bta").value);
+          if (!Array.isArray(d.tasks)) throw 0;
+          d.done = d.done || {};
+          db = d;
+          save();
+          show("home");
+          $("#bdlg").close();
+          toast("Backup loaded");
+        } catch (e) {
+          toast("That is not a valid backup");
+        }
+      };
+      $("#brs").onclick = () => {
+        $("#bdlg").close();
+        ask("Reset everything to the original tasks?", () => {
+          db = fresh();
+          save();
+          show("home");
+          toast("Reset done");
+        });
+      };
+      const setAdm = (v) => {
+        document.body.classList.toggle("admin", v);
+        $("#adm").checked = v;
+        $("#al").textContent = v ? "🔓" : "🔒";
+        try {
+          sessionStorage.setItem("ih-admin", v ? "1" : "0");
+        } catch (e) {}
+      };
+      const PW = "d55491ff18a9c02546401fe6650eebb19c8dcb2f09540bc3de9eafe4ffe8c4f8";
+      const sha = async (s) =>
+        [
+          ...new Uint8Array(
+            await crypto.subtle.digest("SHA-256", new TextEncoder().encode("ih|" + s)),
+          ),
+        ]
+          .map((x) => x.toString(16).padStart(2, "0"))
+          .join("");
+      const getPw = () => {
+        try {
+          return localStorage.getItem("ih-pw") || PW;
+        } catch (e) {
+          return PW;
+        }
+      };
+      const G =
+        '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4c-.2 1.2-.9 2.3-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6C4.7 19.9 8.1 22 12 22z"/><path fill="#FBBC05" d="M6.4 13.9c-.2-.6-.3-1.3-.3-1.9s.1-1.3.3-1.9V7.5H3.1C2.4 8.8 2 10.4 2 12s.4 3.2 1.1 4.5l3.3-2.6z"/><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.9C17 2.9 14.7 2 12 2 8.1 2 4.7 4.1 3.1 7.5l3.3 2.6C7.2 7.7 9.4 5.9 12 5.9z"/></svg>';
+      const W =
+        '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#25D366" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
+      const CT =
+        '<a class="cc" href="mailto:arfaisal712@gmail.com">' +
+        G +
+        'arfaisal712@gmail.com</a><a class="cc" href="https://wa.me/8801711101445" target="_blank" rel="noopener">' +
+        W +
+        "01711101445</a>";
+      const MAKER =
+        '<footer class="maker"><div class="av" aria-hidden="true">AF</div><div class="mi"><small>Made by</small><b>Aminur Refat Faisal</b><span>Network Support Engineer-Intern</span><span>Infolink Limited</span></div><div class="mc">' +
+        CT +
+        "</div></footer>";
+      $("#nc").innerHTML = CT;
+      $("#adm").onchange = (e) => {
+        if (e.target.checked) {
+          e.target.checked = false;
+          $("#apw").value = "";
+          $("#aerr").hidden = true;
+          $("#adlg").showModal();
+          $("#apw").focus();
+        } else {
+          setAdm(false);
+          view();
+        }
+      };
+      $("#afrm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        let good = false;
+        try {
+          good = (await sha($("#apw").value)) === getPw();
+        } catch (x) {}
+        if (good) {
+          $("#adlg").close();
+          setAdm(true);
+          view();
+          toast("Admin mode on");
+        } else {
+          $("#aerr").hidden = false;
+          const c = $("#adlg");
+          c.classList.remove("shake");
+          void c.offsetWidth;
+          c.classList.add("shake");
+          $("#apw").select();
+        }
+      });
+      $("#acan").onclick = () => $("#adlg").close();
+      $("#eye").onclick = () => {
+        const p = $("#apw"),
+          s = p.type === "password";
+        p.type = s ? "text" : "password";
+        $("#eye").textContent = s ? "Hide" : "Show";
+      };
+      $("#pwb").onclick = () => {
+        $("#np1").value = $("#np2").value = "";
+        $("#nerr").hidden = true;
+        $("#cpdlg").showModal();
+      };
+      $("#ncan").onclick = () => $("#cpdlg").close();
+      $("#cpfrm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const a = $("#np1").value;
+        if (a.length < 6 || a !== $("#np2").value) {
+          $("#nerr").textContent =
+            a.length < 6 ? "Use at least 6 characters." : "The two passwords do not match.";
+          $("#nerr").hidden = false;
+          return;
+        }
+        try {
+          localStorage.setItem("ih-pw", await sha(a));
+          $("#cpdlg").close();
+          toast("Password changed");
+        } catch (x) {
+          $("#nerr").textContent = "Could not save the password in this browser.";
+          $("#nerr").hidden = false;
+        }
+      });
+      const setTh = (t) => {
+        document.documentElement.dataset.theme = t;
+        $("#th").textContent = t === "dark" ? "☀️" : "🌙";
+        try {
+          localStorage.setItem("ih-theme", t);
+        } catch (e) {}
+      };
+      $("#th").onclick = () =>
+        setTh(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+      $("#mb").onclick = () => side(1);
+      $("#scrim").onclick = () => side(0);
+      addEventListener("hashchange", () => {
+        const h = location.hash.slice(1);
+        if (h && h !== cur) show(h);
+      });
+      let a0 = "0";
+      try {
+        a0 = sessionStorage.getItem("ih-admin") || "0";
+        localStorage.setItem("ih-t", "1");
+      } catch (e) {
+        ok = false;
+      }
+      setAdm(a0 === "1");
+      setTh(document.documentElement.dataset.theme);
+      show(location.hash.slice(1) || "home", 1);
+      if (!ok) toast("Saving is off in this browser mode");
+    </script>
+  </body>
+</html>
